@@ -1,0 +1,382 @@
+{
+  "entities": {
+    "StatinRegimen": {
+      "title": "StatinRegimen",
+      "description": "A prescribed cholesterol-lowering medication regimen (statin or PCSK9 inhibitor such as Repatha) tracked by an authenticated user.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Authenticated Firebase UID of the regimen owner."
+        },
+        "statinName": {
+          "type": "string",
+          "description": "Generic medication name (e.g., Atorvastatin, Evolocumab)."
+        },
+        "brandName": {
+          "type": "string",
+          "description": "Optional brand name (e.g., Lipitor, Repatha)."
+        },
+        "doseMg": {
+          "type": "integer",
+          "description": "Prescribed dose strength in milligrams (1..4000)."
+        },
+        "therapyRole": {
+          "type": "string",
+          "enum": ["primary", "adjunct"],
+          "description": "Optional role in combination therapy (primary or adjunct; defaults to primary)."
+        },
+        "frequencyKey": {
+          "type": "string",
+          "enum": [
+            "once_daily_evening",
+            "once_daily_morning",
+            "every_other_day",
+            "every_2_weeks",
+            "once_monthly",
+            "custom"
+          ],
+          "description": "Storage key for dosing frequency."
+        },
+        "scheduledTimeMinutes": {
+          "type": "integer",
+          "description": "Preferred dose time as minutes from midnight (0..1439)."
+        },
+        "active": {
+          "type": "boolean",
+          "description": "True when this regimen is currently active."
+        },
+        "startedAtMillis": {
+          "type": "integer",
+          "description": "Epoch milliseconds when this regimen started."
+        },
+        "endedAtMillis": {
+          "type": "integer",
+          "description": "Optional epoch milliseconds when this regimen was superseded or stopped."
+        },
+        "switchReason": {
+          "type": "string",
+          "description": "Optional clinical reason for switching or adding this regimen."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Optional regimen instructions or notes."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server-generated creation timestamp (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server-generated last update timestamp (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "statinName",
+        "brandName",
+        "doseMg",
+        "frequencyKey",
+        "scheduledTimeMinutes",
+        "active",
+        "startedAtMillis",
+        "switchReason",
+        "notes",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "DoseLog": {
+      "title": "DoseLog",
+      "description": "A daily medication adherence, mood, and side-effect check-in entry linked to a regimen.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Authenticated Firebase UID of the log owner."
+        },
+        "regimenId": {
+          "type": "string",
+          "description": "Firestore document ID of the StatinRegimen logged."
+        },
+        "statinName": {
+          "type": "string",
+          "description": "Medication generic name snapshot at time of log."
+        },
+        "brandName": {
+          "type": "string",
+          "description": "Medication brand name snapshot at time of log."
+        },
+        "doseMg": {
+          "type": "integer",
+          "description": "Dose strength in mg snapshot (1..4000)."
+        },
+        "frequencyKey": {
+          "type": "string",
+          "enum": [
+            "once_daily_evening",
+            "once_daily_morning",
+            "every_other_day",
+            "every_2_weeks",
+            "once_monthly",
+            "custom"
+          ],
+          "description": "Storage key for dosing frequency snapshot."
+        },
+        "taken": {
+          "type": "boolean",
+          "description": "True if the dose was taken; false if skipped."
+        },
+        "logDateKey": {
+          "type": "string",
+          "description": "Local calendar date key formatted yyyy-MM-dd."
+        },
+        "takenAtMinutes": {
+          "type": "integer",
+          "description": "Time of check-in/dose in minutes from midnight (0..1439)."
+        },
+        "loggedAtMillis": {
+          "type": "integer",
+          "description": "Client epoch milliseconds when entry was recorded."
+        },
+        "feelLevelKey": {
+          "type": "string",
+          "enum": ["great", "good", "okay", "sluggish", "rough"],
+          "description": "Quick-tap mood/comfort rating key."
+        },
+        "sideEffectsCsv": {
+          "type": "string",
+          "description": "Comma-separated SideEffectOption storage keys (empty if none)."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Optional patient notes for healthcare provider."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server-generated creation timestamp (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server-generated last update timestamp (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "regimenId",
+        "statinName",
+        "brandName",
+        "doseMg",
+        "frequencyKey",
+        "taken",
+        "logDateKey",
+        "takenAtMinutes",
+        "loggedAtMillis",
+        "feelLevelKey",
+        "sideEffectsCsv",
+        "notes",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "ReminderSettings": {
+      "title": "ReminderSettings",
+      "description": "Per-user reminder preferences stored at users/{userId}/settings/reminders.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Authenticated Firebase UID of the settings owner."
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether schedule-aware medication reminders are enabled."
+        },
+        "hour": {
+          "type": "integer",
+          "description": "Reminder hour of day (0..23)."
+        },
+        "minute": {
+          "type": "integer",
+          "description": "Reminder minute of hour (0..59)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server-generated creation timestamp (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server-generated last update timestamp (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "enabled",
+        "hour",
+        "minute",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "ClinicalTargets": {
+      "title": "ClinicalTargets",
+      "description": "Per-user physician-prescribed lipid targets stored at users/{userId}/settings/targets.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Authenticated Firebase UID of the targets owner."
+        },
+        "ldlTargetMgDl": {
+          "type": "integer",
+          "description": "Physician-prescribed LDL-C goal in mg/dL (20..300)."
+        },
+        "nonHdlTargetMgDl": {
+          "type": "integer",
+          "description": "Optional Non-HDL-C goal in mg/dL (30..400)."
+        },
+        "apoBTargetMgDl": {
+          "type": "integer",
+          "description": "Optional ApoB goal in mg/dL (20..250)."
+        },
+        "riskLabel": {
+          "type": "string",
+          "description": "Short clinical target tier label (e.g., High Risk (<70))."
+        },
+        "clinicianNote": {
+          "type": "string",
+          "description": "Optional note about the physician-prescribed goal."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server-generated creation timestamp (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server-generated last update timestamp (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "ldlTargetMgDl",
+        "riskLabel",
+        "clinicianNote",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "LipidPanel": {
+      "title": "LipidPanel",
+      "description": "A blood work lipid panel entry logged by an authenticated user for trend tracking and clinical insights.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Authenticated Firebase UID of the lipid panel owner."
+        },
+        "drawDateKey": {
+          "type": "string",
+          "description": "Lab draw calendar date formatted yyyy-MM-dd."
+        },
+        "drawnAtMillis": {
+          "type": "integer",
+          "description": "Epoch milliseconds for the lab draw date."
+        },
+        "totalCholesterolMgDl": {
+          "type": "integer",
+          "description": "Total Cholesterol in mg/dL (1..2000)."
+        },
+        "ldlMgDl": {
+          "type": "integer",
+          "description": "LDL Cholesterol (LDL-C) in mg/dL (1..2000)."
+        },
+        "hdlMgDl": {
+          "type": "integer",
+          "description": "HDL Cholesterol (HDL-C) in mg/dL (1..500)."
+        },
+        "triglyceridesMgDl": {
+          "type": "integer",
+          "description": "Triglycerides in mg/dL (1..5000)."
+        },
+        "nonHdlMgDl": {
+          "type": "integer",
+          "description": "Optional Non-HDL Cholesterol in mg/dL (1..2000)."
+        },
+        "apoBMgDl": {
+          "type": "integer",
+          "description": "Optional Apolipoprotein B (ApoB) in mg/dL (1..500)."
+        },
+        "lpAMgDl": {
+          "type": "integer",
+          "description": "Optional Lipoprotein(a) in mg/dL (1..1000)."
+        },
+        "fasting": {
+          "type": "boolean",
+          "description": "True if the blood draw was fasting."
+        },
+        "baselinePanel": {
+          "type": "boolean",
+          "description": "Optional flag marking this draw as the patient's pre-therapy baseline anchor."
+        },
+        "labName": {
+          "type": "string",
+          "description": "Optional laboratory or clinic name."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Optional patient or clinician lab notes."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server-generated creation timestamp (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server-generated last update timestamp (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "drawDateKey",
+        "drawnAtMillis",
+        "totalCholesterolMgDl",
+        "ldlMgDl",
+        "hdlMgDl",
+        "triglyceridesMgDl",
+        "fasting",
+        "labName",
+        "notes",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/regimens/{regimenId}": {
+      "schema": { "$ref": "#/entities/StatinRegimen" },
+      "description": "User-scoped medication regimens including active primary/adjunct therapies and prior switch history."
+    },
+    "/users/{userId}/logs/{logId}": {
+      "schema": { "$ref": "#/entities/DoseLog" },
+      "description": "User-scoped daily medication, mood, and side-effect check-in logs."
+    },
+    "/users/{userId}/settings/{settingId}": {
+      "schema": { "$ref": "#/entities/ReminderSettings" },
+      "description": "User-scoped settings documents (reminders for ReminderSettings, targets for ClinicalTargets)."
+    },
+    "/users/{userId}/lipid_panels/{panelId}": {
+      "schema": { "$ref": "#/entities/LipidPanel" },
+      "description": "User-scoped blood work lipid panel results for longitudinal trend tracking."
+    }
+  }
+}

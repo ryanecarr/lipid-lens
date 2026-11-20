@@ -1,0 +1,52 @@
+# Gradle & Build Outputs
+*.iml
+.gradle/
+.kotlin/
+/build
+/captures
+.externalNativeBuild/
+.cxx/
+.build-outputs/
+*.apk
+*.aab
+*.ap_
+
+# Local Configuration & IDE
+local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+.aistudio/
+
+# Debug & Emulator Logs
+*-debug.log
+*.log
+
+# Environment Variables & Secrets
+.env
+.env.*
+!.env.example
+*service-account*.json
+*firebase-adminsdk*.json
+credentials.json
+
+# Signing Keystores & Certificates
+*.jks
+*.keystore
+*.keystore.base64
+debug.keystore
+debug.keystore.base64
+*.p12
+*.pfx
+*.pem
+*.key
+keystore.properties
+
+# Firebase / Google Client Config (keeps API keys, OAuth client IDs & site keys out of public repos)
+google-services.json
+app/google-services.json
+app/src/main/res/values/firebase_applet_config.xml

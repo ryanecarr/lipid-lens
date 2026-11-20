@@ -1,0 +1,324 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Pillar 4.1: Global default-deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Shared primitives
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidFrequencyKey(key) {
+      return key in [
+        'once_daily_evening',
+        'once_daily_morning',
+        'every_other_day',
+        'every_2_weeks',
+        'once_monthly',
+        'custom'
+      ];
+    }
+
+    function isValidFeelLevelKey(key) {
+      return key in ['great', 'good', 'okay', 'sluggish', 'rough'];
+    }
+
+    // Entity validation helpers (Anti-Update-Gap)
+    function isValidRegimen(data) {
+      return data.userId is string &&
+             data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.statinName is string &&
+             data.statinName.size() >= 1 && data.statinName.size() <= 60 &&
+             data.brandName is string &&
+             data.brandName.size() <= 60 &&
+             data.doseMg is int &&
+             data.doseMg >= 1 && data.doseMg <= 4000 &&
+             (!('therapyRole' in data) || (data.therapyRole is string && data.therapyRole in ['primary', 'adjunct'])) &&
+             data.frequencyKey is string &&
+             isValidFrequencyKey(data.frequencyKey) &&
+             data.scheduledTimeMinutes is int &&
+             data.scheduledTimeMinutes >= 0 && data.scheduledTimeMinutes <= 1439 &&
+             data.active is bool &&
+             data.startedAtMillis is int &&
+             data.startedAtMillis >= 0 &&
+             (!('endedAtMillis' in data) || (data.endedAtMillis is int && data.endedAtMillis >= 0)) &&
+             data.switchReason is string &&
+             data.switchReason.size() <= 120 &&
+             data.notes is string &&
+             data.notes.size() <= 200 &&
+             data.createdAt is timestamp &&
+             data.createdAt <= request.time &&
+             data.updatedAt is timestamp &&
+             data.updatedAt <= request.time;
+    }
+
+    function isValidDoseLog(data) {
+      return data.userId is string &&
+             data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.regimenId is string &&
+             isValidId(data.regimenId) &&
+             data.statinName is string &&
+             data.statinName.size() >= 1 && data.statinName.size() <= 60 &&
+             data.brandName is string &&
+             data.brandName.size() <= 60 &&
+             data.doseMg is int &&
+             data.doseMg >= 1 && data.doseMg <= 4000 &&
+             data.frequencyKey is string &&
+             isValidFrequencyKey(data.frequencyKey) &&
+             data.taken is bool &&
+             data.logDateKey is string &&
+             data.logDateKey.size() == 10 &&
+             data.logDateKey.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$') &&
+             data.takenAtMinutes is int &&
+             data.takenAtMinutes >= 0 && data.takenAtMinutes <= 1439 &&
+             data.loggedAtMillis is int &&
+             data.loggedAtMillis >= 0 &&
+             data.feelLevelKey is string &&
+             isValidFeelLevelKey(data.feelLevelKey) &&
+             data.sideEffectsCsv is string &&
+             data.sideEffectsCsv.size() <= 200 &&
+             data.notes is string &&
+             data.notes.size() <= 400 &&
+             data.createdAt is timestamp &&
+             data.createdAt <= request.time &&
+             data.updatedAt is timestamp &&
+             data.updatedAt <= request.time;
+    }
+
+    function isValidReminderSettings(data) {
+      return data.userId is string &&
+             data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.enabled is bool &&
+             data.hour is int &&
+             data.hour >= 0 && data.hour <= 23 &&
+             data.minute is int &&
+             data.minute >= 0 && data.minute <= 59 &&
+             data.createdAt is timestamp &&
+             data.createdAt <= request.time &&
+             data.updatedAt is timestamp &&
+             data.updatedAt <= request.time;
+    }
+
+    function isValidClinicalTargets(data) {
+      return data.userId is string &&
+             data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.ldlTargetMgDl is int &&
+             data.ldlTargetMgDl >= 20 && data.ldlTargetMgDl <= 300 &&
+             (!('nonHdlTargetMgDl' in data) || (data.nonHdlTargetMgDl is int && data.nonHdlTargetMgDl >= 30 && data.nonHdlTargetMgDl <= 400)) &&
+             (!('apoBTargetMgDl' in data) || (data.apoBTargetMgDl is int && data.apoBTargetMgDl >= 20 && data.apoBTargetMgDl <= 250)) &&
+             data.riskLabel is string &&
+             data.riskLabel.size() >= 1 && data.riskLabel.size() <= 60 &&
+             data.clinicianNote is string &&
+             data.clinicianNote.size() <= 160 &&
+             data.createdAt is timestamp &&
+             data.createdAt <= request.time &&
+             data.updatedAt is timestamp &&
+             data.updatedAt <= request.time;
+    }
+
+    function isValidLipidPanel(data) {
+      return data.userId is string &&
+             data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.drawDateKey is string &&
+             data.drawDateKey.size() == 10 &&
+             data.drawDateKey.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$') &&
+             data.drawnAtMillis is int &&
+             data.drawnAtMillis >= 0 &&
+             data.totalCholesterolMgDl is int &&
+             data.totalCholesterolMgDl >= 1 && data.totalCholesterolMgDl <= 2000 &&
+             data.ldlMgDl is int &&
+             data.ldlMgDl >= 1 && data.ldlMgDl <= 2000 &&
+             data.hdlMgDl is int &&
+             data.hdlMgDl >= 1 && data.hdlMgDl <= 500 &&
+             data.triglyceridesMgDl is int &&
+             data.triglyceridesMgDl >= 1 && data.triglyceridesMgDl <= 5000 &&
+             (!('nonHdlMgDl' in data) || (data.nonHdlMgDl is int && data.nonHdlMgDl >= 1 && data.nonHdlMgDl <= 2000)) &&
+             (!('apoBMgDl' in data) || (data.apoBMgDl is int && data.apoBMgDl >= 1 && data.apoBMgDl <= 500)) &&
+             (!('lpAMgDl' in data) || (data.lpAMgDl is int && data.lpAMgDl >= 1 && data.lpAMgDl <= 1000)) &&
+             data.fasting is bool &&
+             (!('baselinePanel' in data) || data.baselinePanel is bool) &&
+             data.labName is string &&
+             data.labName.size() <= 80 &&
+             data.notes is string &&
+             data.notes.size() <= 400 &&
+             data.createdAt is timestamp &&
+             data.createdAt <= request.time &&
+             data.updatedAt is timestamp &&
+             data.updatedAt <= request.time;
+    }
+
+    // User-scoped medication regimens
+    match /users/{userId}/regimens/{regimenId} {
+      allow get: if isOwner(userId) && isValidId(regimenId);
+      allow list: if isOwner(userId);
+
+      allow create: if isOwner(userId) &&
+                       isValidId(regimenId) &&
+                       incoming().userId == request.auth.uid &&
+                       incoming().keys().hasAll([
+                         'userId', 'statinName', 'brandName', 'doseMg', 'frequencyKey',
+                         'scheduledTimeMinutes', 'active', 'startedAtMillis',
+                         'switchReason', 'notes', 'createdAt', 'updatedAt'
+                       ]) &&
+                       incoming().keys().hasOnly([
+                         'userId', 'statinName', 'brandName', 'doseMg', 'therapyRole', 'frequencyKey',
+                         'scheduledTimeMinutes', 'active', 'startedAtMillis', 'endedAtMillis',
+                         'switchReason', 'notes', 'createdAt', 'updatedAt'
+                       ]) &&
+                       isValidRegimen(incoming());
+
+      allow update: if isOwner(userId) &&
+                       isValidId(regimenId) &&
+                       isValidRegimen(incoming()) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().diff(existing()).affectedKeys().hasOnly([
+                         'active', 'endedAtMillis', 'updatedAt'
+                       ]);
+
+      allow delete: if isOwner(userId) && isValidId(regimenId);
+    }
+
+    // User-scoped daily dose & symptom check-in logs
+    match /users/{userId}/logs/{logId} {
+      allow get: if isOwner(userId) && isValidId(logId);
+      allow list: if isOwner(userId);
+
+      allow create: if isOwner(userId) &&
+                       isValidId(logId) &&
+                       incoming().userId == request.auth.uid &&
+                       incoming().keys().hasAll([
+                         'userId', 'regimenId', 'statinName', 'brandName', 'doseMg',
+                         'frequencyKey', 'taken', 'logDateKey', 'takenAtMinutes',
+                         'loggedAtMillis', 'feelLevelKey', 'sideEffectsCsv', 'notes',
+                         'createdAt', 'updatedAt'
+                       ]) &&
+                       incoming().keys().hasOnly([
+                         'userId', 'regimenId', 'statinName', 'brandName', 'doseMg',
+                         'frequencyKey', 'taken', 'logDateKey', 'takenAtMinutes',
+                         'loggedAtMillis', 'feelLevelKey', 'sideEffectsCsv', 'notes',
+                         'createdAt', 'updatedAt'
+                       ]) &&
+                       isValidDoseLog(incoming());
+
+      allow update: if isOwner(userId) &&
+                       isValidId(logId) &&
+                       isValidDoseLog(incoming()) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().diff(existing()).affectedKeys().hasOnly([
+                         'taken', 'logDateKey', 'takenAtMinutes', 'loggedAtMillis',
+                         'feelLevelKey', 'sideEffectsCsv', 'notes', 'updatedAt'
+                       ]);
+
+      allow delete: if isOwner(userId) && isValidId(logId);
+    }
+
+    // User-scoped settings (document IDs: reminders, targets)
+    match /users/{userId}/settings/{settingId} {
+      allow get: if isOwner(userId) && settingId in ['reminders', 'targets'];
+      allow list: if isOwner(userId);
+
+      allow create: if isOwner(userId) &&
+                       incoming().userId == request.auth.uid && (
+                         (
+                           settingId == 'reminders' &&
+                           incoming().keys().hasAll([
+                             'userId', 'enabled', 'hour', 'minute', 'createdAt', 'updatedAt'
+                           ]) &&
+                           incoming().keys().hasOnly([
+                             'userId', 'enabled', 'hour', 'minute', 'createdAt', 'updatedAt'
+                           ]) &&
+                           isValidReminderSettings(incoming())
+                         ) || (
+                           settingId == 'targets' &&
+                           incoming().keys().hasAll([
+                             'userId', 'ldlTargetMgDl', 'riskLabel', 'clinicianNote', 'createdAt', 'updatedAt'
+                           ]) &&
+                           incoming().keys().hasOnly([
+                             'userId', 'ldlTargetMgDl', 'nonHdlTargetMgDl', 'apoBTargetMgDl',
+                             'riskLabel', 'clinicianNote', 'createdAt', 'updatedAt'
+                           ]) &&
+                           isValidClinicalTargets(incoming())
+                         )
+                       );
+
+      allow update: if isOwner(userId) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt && (
+                         (
+                           settingId == 'reminders' &&
+                           isValidReminderSettings(incoming()) &&
+                           incoming().diff(existing()).affectedKeys().hasOnly([
+                             'enabled', 'hour', 'minute', 'updatedAt'
+                           ])
+                         ) || (
+                           settingId == 'targets' &&
+                           isValidClinicalTargets(incoming()) &&
+                           incoming().diff(existing()).affectedKeys().hasOnly([
+                             'ldlTargetMgDl', 'nonHdlTargetMgDl', 'apoBTargetMgDl',
+                             'riskLabel', 'clinicianNote', 'updatedAt'
+                           ])
+                         )
+                       );
+
+      allow delete: if isOwner(userId) && settingId in ['reminders', 'targets'];
+    }
+
+    // User-scoped blood work lipid panels
+    match /users/{userId}/lipid_panels/{panelId} {
+      allow get: if isOwner(userId) && isValidId(panelId);
+      allow list: if isOwner(userId);
+
+      allow create: if isOwner(userId) &&
+                       isValidId(panelId) &&
+                       incoming().userId == request.auth.uid &&
+                       incoming().keys().hasAll([
+                         'userId', 'drawDateKey', 'drawnAtMillis', 'totalCholesterolMgDl',
+                         'ldlMgDl', 'hdlMgDl', 'triglyceridesMgDl', 'fasting',
+                         'labName', 'notes', 'createdAt', 'updatedAt'
+                       ]) &&
+                       incoming().keys().hasOnly([
+                         'userId', 'drawDateKey', 'drawnAtMillis', 'totalCholesterolMgDl',
+                         'ldlMgDl', 'hdlMgDl', 'triglyceridesMgDl', 'nonHdlMgDl',
+                         'apoBMgDl', 'lpAMgDl', 'fasting', 'baselinePanel',
+                         'labName', 'notes', 'createdAt', 'updatedAt'
+                       ]) &&
+                       isValidLipidPanel(incoming());
+
+      allow update: if isOwner(userId) &&
+                       isValidId(panelId) &&
+                       isValidLipidPanel(incoming()) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().diff(existing()).affectedKeys().hasOnly([
+                         'drawDateKey', 'drawnAtMillis', 'totalCholesterolMgDl',
+                         'ldlMgDl', 'hdlMgDl', 'triglyceridesMgDl', 'nonHdlMgDl',
+                         'apoBMgDl', 'lpAMgDl', 'fasting', 'baselinePanel',
+                         'labName', 'notes', 'updatedAt'
+                       ]);
+
+      allow delete: if isOwner(userId) && isValidId(panelId);
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Lipid Lens",
+  "description": "Track lipid panels, cholesterol therapy adherence, side effects, AI cardiology insights, and export PDF clinical reports.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

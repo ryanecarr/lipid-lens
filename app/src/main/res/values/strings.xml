@@ -1,0 +1,73 @@
+<resources>
+    <string name="app_name">Lipid Lens</string>
+
+    <!-- Navigation -->
+    <string name="nav_summary">Summary</string>
+    <string name="nav_logs">Logs</string>
+    <string name="nav_labs">Labs</string>
+    <string name="nav_medications">Therapy</string>
+    <string name="nav_reports">PDF</string>
+
+    <!-- Header & Actions -->
+    <string name="cd_reminder_settings">Reminder settings</string>
+    <string name="cd_theme_palette">Color palette and theme</string>
+    <string name="cd_switch_statin">Switch or add cholesterol medication</string>
+    <string name="cd_clinical_emblem">Lipid Lens clinical emblem</string>
+    <string name="cd_empty_logs_art">Daily medication log journal</string>
+    <string name="cd_refresh_ai_insights">Refresh cardiology insights</string>
+    <string name="action_log_todays_dose">Log Today\'s Dose</string>
+    <string name="action_update_todays_log">Update Today\'s Log</string>
+    <string name="action_switch_statin">Switch or Add Therapy</string>
+    <string name="action_start_regimen">Set Up Your Therapy</string>
+    <string name="action_save_log">Save Check-In</string>
+    <string name="action_save_regimen">Save Regimen</string>
+    <string name="action_log_lab_panel">Log Lab Panel</string>
+    <string name="action_save_lab_panel">Save Lab Panel</string>
+    <string name="action_generate_ai_insight">Analyze My Trends</string>
+    <string name="action_set_targets">Targets</string>
+    <string name="title_lipid_labs">Lipid Labs &amp; Trends</string>
+    <string name="title_personal_cardiology_insights">Personal Cardiology Insights</string>
+    <string name="title_clinical_targets">Clinician Lipid Targets</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_select">Select</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_share_pdf">Share PDF Report</string>
+    <string name="action_save_pdf">Save PDF to Device</string>
+    <string name="action_send_test_reminder">Send Test Notification</string>
+    <string name="title_pdf_ai_brief">AI Physician Visit Brief</string>
+    <string name="subtitle_pdf_ai_brief">20-second clinical synthesis on Page 1</string>
+    <string name="action_refresh_brief">Refresh Brief</string>
+
+    <!-- Dashboard & Onboarding -->
+    <string name="summary_subtitle_cloud">Lipid &amp; therapy tracker</string>
+    <string name="hero_no_statin_title">Ready to start tracking?</string>
+
+    <!-- Authentication & Account -->
+    <string name="action_sign_in_google">Sign in with Google</string>
+    <string name="action_sign_out">Sign Out</string>
+    <string name="cd_account_menu">Account and cloud sync</string>
+    <string name="auth_tagline">Track lipid panels, cholesterol therapy, and preventive cardiology insights with private cloud backup.</string>
+    <string name="auth_highlight_private_title">Private &amp; User-Isolated</string>
+    <string name="auth_highlight_private_body">Your lipid labs and therapy history are strictly scoped to your Google account with zero-trust Firestore rules.</string>
+    <string name="auth_highlight_sync_title">Seamless Cloud Sync</string>
+    <string name="auth_highlight_sync_body">Keep lipid panels, therapy changes, and daily check-ins across devices or reinstalls.</string>
+    <string name="auth_highlight_pdf_title">Doctor-Ready PDF Reports</string>
+    <string name="auth_highlight_pdf_body">Export multi-page lipid trend, adherence, and tolerance summaries for appointments anytime.</string>
+    <string name="hero_no_statin_body">Select the statin, non-statin, or combination therapy prescribed by your doctor to start tracking doses and lipid response.</string>
+    <string name="label_active_regimen">ACTIVE THERAPY</string>
+    <string name="label_todays_checkin">TODAY\'S CHECK-IN</string>
+    <string name="label_adherence_7d">7-Day Adherence</string>
+    <string name="label_adherence_30d">30-Day Adherence</string>
+    <string name="label_current_streak">Current Streak</string>
+    <string name="label_feeling_overview">How You\'re Feeling</string>
+    <string name="label_side_effects_overview">Reported Side Effects</string>
+
+    <!-- Notifications -->
+    <string name="reminder_channel_name">Lipid Therapy Reminders</string>
+    <string name="reminder_channel_desc">Schedule-aware reminders for your prescribed lipid-lowering therapy</string>
+    <string name="reminder_notif_title">Time for your %1$s (%2$d mg)</string>
+    <string name="reminder_notif_title_generic">Time for your scheduled dose</string>
+    <string name="reminder_notif_body">Tap to log your dose, how you feel, and any side effects in Lipid Lens.</string>
+    <string name="reminder_notif_body_cadence">%1$s • Tap to log your dose and comfort check-in in Lipid Lens.</string>
+</resources>

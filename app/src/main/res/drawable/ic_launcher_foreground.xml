@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Subtle optical glass tint inside lens (centered in 66dp safe zone) -->
+    <path
+        android:fillColor="#2E8DBBFF"
+        android:pathData="M50,33 A17,17 0 1,1 49.99,33 Z" />
+
+    <!-- Rounded optical lens handle -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M63.8,63.8 L73.5,73.5"
+        android:strokeWidth="6.0"
+        android:strokeColor="#A8CCFF"
+        android:strokeLineCap="round" />
+
+    <!-- Lipid biomarker trend curve inside the lens -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M40.5,46.0 C45.0,46.0 46.8,54.0 51.5,54.0 C54.2,54.0 55.6,51.5 58.0,51.5"
+        android:strokeWidth="3.5"
+        android:strokeColor="#8DBBFF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+    <!-- Baseline start node -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M40.5,43.4 A2.6,2.6 0 1,1 40.49,43.4 Z" />
+
+    <!-- Bold optical lens ring -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M50,31.5 A18.5,18.5 0 1,1 49.99,31.5 Z"
+        android:strokeWidth="5.0"
+        android:strokeColor="#FFFFFF" />
+
+    <!-- Target endpoint precision node (white halo + coral accent) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M58.0,46.8 A4.7,4.7 0 1,1 57.99,46.8 Z" />
+    <path
+        android:fillColor="#EB6B56"
+        android:pathData="M58.0,48.3 A3.2,3.2 0 1,1 57.99,48.3 Z" />
+</vector>
